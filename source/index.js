@@ -67,16 +67,10 @@ if (text === "HELP") {
   );
 }
 
-  if (text === "OTP") {
-    const otp = generateDailyOtp();
-return replyText(
-  env,
-  event.replyToken,
-  `🔐 รหัส OTP สำหรับสร้าง PIN ใหม่คือ\n\n` +
-  `👉 ${otp}\n\n` +
-  `⏰ รหัสนี้ใช้ได้ภายในวันนี้เท่านั้นนะคะ`
-);
-  }
+if (text === "OTP") {
+  const otp = generateDailyOtp();
+  return replyFlex(env, event.replyToken, createOtpFlex(otp));
+}
 
   if (text === "ZOOM1") {
     return replyText(env, event.replyToken,
@@ -140,4 +134,94 @@ async function replyText(env, replyToken, text) {
 
   const result = await response.text();
   console.log("LINE reply result:", response.status, result);
+}
+
+async function replyFlex(env, replyToken, flexMessage) {
+  const res = await fetch("https://api.line.me/v2/bot/message/reply", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      replyToken,
+      messages: [
+        {
+          type: "flex",
+          altText: flexMessage.altText,
+          contents: flexMessage.contents,
+        },
+      ],
+    }),
+  });
+
+  const result = await res.text();
+  console.log("LINE flex reply:", res.status, result);
+}
+
+function createOtpFlex(otp) {
+  return {
+    altText: `รหัส OTP สำหรับสร้าง PIN ใหม่คือ ${otp}`,
+    contents: {
+      type: "bubble",
+      size: "mega",
+      body: {
+        type: "box",
+        layout: "vertical",
+        spacing: "md",
+        backgroundColor: "#FFF7ED",
+        contents: [
+          {
+            type: "text",
+            text: "🔐 OTP \n สำหรับสร้าง PIN ใหม่",
+            weight: "bold",
+            size: "xl",
+            color: "#C06428",
+            wrap: true,
+          },
+          {
+            type: "text",
+            text: "ใช้รหัสนี้เพื่อตั้งค่า PIN ใหม่ของคุณ",
+            size: "sm",
+            color: "#64748B",
+            wrap: true,
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            backgroundColor: "#FFFFFF",
+            cornerRadius: "18px",
+            paddingAll: "20px",
+            margin: "lg",
+            contents: [
+              {
+                type: "text",
+                text: otp,
+                weight: "bold",
+                size: "5xl",
+                align: "center",
+                color: "#0F172A",
+              },
+              {
+                type: "text",
+                text: "ใช้ได้ภายในวันนี้เท่านั้น",
+                size: "sm",
+                align: "center",
+                color: "#64748B",
+                margin: "sm",
+              },
+            ],
+          },
+          {
+            type: "text",
+            text: "⏰ รหัสนี้จะหมดอายุเมื่อสิ้นสุดวัน",
+            size: "xs",
+            color: "#94A3B8",
+            wrap: true,
+            margin: "md",
+          },
+        ],
+      },
+    },
+  };
 }
