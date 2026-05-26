@@ -36,26 +36,36 @@ async function handleLineEvent(event, env) {
 
   const text = event.message.text.trim().toUpperCase();
 
-  if (text === "MENU") {
-    return replyText(env, event.replyToken,
-      "📋 NexyGirl Menu\n\n" +
-      "พิมพ์คำสั่ง:\n" +
-      "OTP = ขอรหัสสร้าง PIN ใหม่\n" +
-      "ZOOM1 = รับลิงก์ Zoom 1\n" +
-      "ZOOM2 = รับลิงก์ Zoom 2\n" +
-      "HELP = วิธีใช้งาน"
-    );
-  }
+if (text === "MENU") {
+  return replyText(
+    env,
+    event.replyToken,
+    `📋 NexyGirl Command Menu\n\n` +
+    `พิมพ์คำสั่งที่ต้องการได้เลยค่ะ\n\n` +
+    `🔐 OTP\n` +
+    `ขอรหัสสำหรับสร้าง PIN ประจำวัน\n\n` +
+    `🎥 ZOOM1\n` +
+    `รับลิงก์ Zoom ห้องหลัก\n\n` +
+    `🎥 ZOOM2\n` +
+    `รับลิงก์ Zoom ห้องสำรอง / ห้องเรียน\n\n` +
+    `❓ HELP\n` +
+    `ดูวิธีใช้งานบอท`
+  );
+}
 
-  if (text === "HELP") {
-    return replyText(env, event.replyToken,
-      "วิธีใช้งาน NexyGirl Bot\n\n" +
-      "พิมพ์ MENU เพื่อดูรายการคำสั่ง\n" +
-      "พิมพ์ OTP เพื่อขอรหัสสร้าง PIN ใหม่\n" +
-      "พิมพ์ ZOOM1 เพื่อรับลิงก์ Zoom 1\n" +
-      "พิมพ์ ZOOM2 เพื่อรับลิงก์ Zoom 2"
-    );
-  }
+if (text === "HELP") {
+  return replyText(
+    env,
+    event.replyToken,
+    `❓ วิธีใช้งาน NexyGirl Bot\n\n` +
+    `พิมพ์คำสั่งในกลุ่มได้เลย เช่น\n\n` +
+    `MENU = ดูเมนูทั้งหมด\n` +
+    `OTP = ขอรหัสสร้าง PIN\n` +
+    `ZOOM1 = ลิงก์ Zoom ห้องหลัก\n` +
+    `ZOOM2 = ลิงก์ Zoom ห้องสำรอง\n\n` +
+    `บอทจะตอบเฉพาะคำสั่งที่รู้จักเท่านั้นค่ะ`
+  );
+}
 
   if (text === "OTP") {
     const otp = generateDailyOtp();
