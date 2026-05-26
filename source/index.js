@@ -1,3 +1,7 @@
+const ZOOM1_URL = "https://us06web.zoom.us/j/88270396709?pwd=byNs89aKTTbzJPeKAQgaSUMaPjaYye.1";
+const ZOOM2_URL = "https://us06web.zoom.us/j/7362170193?pwd=Nf6gXcbZRFZ28V8nwc0ibNQ2hef1y9.1";
+
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method === "GET") {
@@ -37,20 +41,7 @@ async function handleLineEvent(event, env) {
   const text = event.message.text.trim().toUpperCase();
 
 if (text === "MENU") {
-  return replyText(
-    env,
-    event.replyToken,
-    `📋 NexyGirl Command Menu\n\n` +
-    `พิมพ์คำสั่งที่ต้องการได้เลยค่ะ\n\n` +
-    `🔐 OTP\n` +
-    `ขอรหัสสำหรับสร้าง PIN ใหม่\n\n` +
-    `🎥 ZOOM1\n` +
-    `รับลิงก์ Zoom ห้องหลัก\n\n` +
-    `🎥 ZOOM2\n` +
-    `รับลิงก์ Zoom ห้องสำรอง / ห้องเรียน\n\n` +
-    `❓ HELP\n` +
-    `ดูวิธีใช้งานบอท`
-  );
+  return replyFlex(env, event.replyToken, createMenuFlex());
 }
 
 if (text === "HELP") {
@@ -62,7 +53,7 @@ if (text === "HELP") {
     `MENU = ดูเมนูทั้งหมด\n` +
     `OTP = ขอรหัสสร้าง PIN\n` +
     `ZOOM1 = ลิงก์ Zoom ห้องหลัก\n` +
-    `ZOOM2 = ลิงก์ Zoom ห้องสำรอง\n\n` +
+    `ZOOM2 = ลิงก์ Zoom ห้องสอง\n\n` +
     `บอทจะตอบเฉพาะคำสั่งที่รู้จักเท่านั้นค่ะ`
   );
 }
@@ -72,21 +63,34 @@ if (text === "OTP") {
   return replyFlex(env, event.replyToken, createOtpFlex(otp));
 }
 
-  if (text === "ZOOM1") {
-    return replyText(env, event.replyToken,
-      "🎥 Zoom ห้องหลัก\n\n" +
-      "ลิงก์ Zoom1:\n" +
-      "https://us06web.zoom.us/j/88270396709?pwd=byNs89aKTTbzJPeKAQgaSUMaPjaYye.1"
-    );
-  }
-
-    if (text === "ZOOM2") {
-    return replyText(env, event.replyToken,
-      "🎥 Zoom ห้อง NexusLife 2\n\n" +
-      "ลิงก์ Zoom2:\n" +
-      "https://us06web.zoom.us/j/7362170193?pwd=Nf6gXcbZRFZ28V8nwc0ibNQ2hef1y9.1"
-    );
-  }
+if (text === "ZOOM1") {
+  return replyZoom(
+    env,
+    event.replyToken,
+    {
+      title: "🎥 Zoom ห้อง 1",
+      description: "ใช้สำหรับเข้าห้อง Zoom หลัก",
+      buttonLabel: "เข้าห้อง Zoom 1",
+      url: ZOOM1_URL,
+      meetingId: "882 7039 6709",
+      passcode: "NxLife",
+    }
+  );
+}
+if (text === "ZOOM2") {
+  return replyZoom(
+    env,
+    event.replyToken,
+    {
+      title: "🎥 Zoom ห้อง 2",
+      description: "ใช้สำหรับเข้าห้อง Zoom สอง / ห้องเรียน",
+      buttonLabel: "เข้าห้อง Zoom 2",
+      url: ZOOM2_URL,
+      meetingId: "853 5427 1817",
+      passcode: "NxLife",
+    }
+  );
+}
 
   // ถ้าไม่ใช่คำสั่ง ให้เงียบ ไม่ตอบรบกวนในกลุ่ม
 }
@@ -224,4 +228,148 @@ function createOtpFlex(otp) {
       },
     },
   };
+}
+
+function createMenuFlex() {
+  return {
+    altText: "NexyGirl Command Menu",
+    contents: {
+      type: "bubble",
+      size: "mega",
+      body: {
+        type: "box",
+        layout: "vertical",
+        spacing: "md",
+        backgroundColor: "#F8FAFC",
+        contents: [
+          {
+            type: "text",
+            text: "📋 NexyGirl Menu",
+            weight: "bold",
+            size: "xl",
+            color: "#0F172A",
+            wrap: true,
+          },
+          {
+            type: "text",
+            text: "แตะปุ่ม หรือพิมพ์คำสั่งที่ต้องการได้เลยค่ะ",
+            size: "sm",
+            color: "#64748B",
+            wrap: true,
+          },
+          createCommandButton("🔐 ขอ OTP", "OTP"),
+          createCommandButton("🎥 Zoom ห้อง 1", "ZOOM1"),
+          createCommandButton("🎥 Zoom ห้อง 2", "ZOOM2"),
+          createCommandButton("❓ วิธีใช้งาน", "HELP"),
+        ],
+      },
+    },
+  };
+}
+
+function createCommandButton(label, commandText) {
+  return {
+    type: "button",
+    style: "secondary",
+    height: "sm",
+    margin: "md",
+    action: {
+      type: "message",
+      label: label,
+      text: commandText,
+    },
+  };
+}
+
+function createZoomFlex({ title, description, buttonLabel, url }) {
+  return {
+    altText: title,
+    contents: {
+      type: "bubble",
+      size: "mega",
+      body: {
+        type: "box",
+        layout: "vertical",
+        spacing: "md",
+        backgroundColor: "#EFF6FF",
+        contents: [
+          {
+            type: "text",
+            text: title,
+            weight: "bold",
+            size: "xl",
+            color: "#1D4ED8",
+            wrap: true,
+          },
+          {
+            type: "text",
+            text: description,
+            size: "sm",
+            color: "#475569",
+            wrap: true,
+          },
+          {
+            type: "button",
+            style: "primary",
+            color: "#2563EB",
+            margin: "lg",
+            action: {
+              type: "uri",
+              label: buttonLabel,
+              uri: url,
+            },
+          },
+          {
+            type: "text",
+            text: "แตะปุ่มเพื่อเปิดลิงก์ Zoom",
+            size: "xs",
+            color: "#94A3B8",
+            wrap: true,
+            margin: "md",
+          },
+        ],
+      },
+    },
+  };
+}
+
+async function replyZoom(env, replyToken, zoom) {
+  const flexMessage = createZoomFlex({
+    title: zoom.title,
+    description: zoom.description,
+    buttonLabel: zoom.buttonLabel,
+    url: zoom.url,
+  });
+
+  const fallbackText =
+    `${zoom.title}\n\n` +
+    `หากกดปุ่มเข้า Zoom ไม่ได้ ให้ใช้ข้อมูลด้านล่างนี้แทน\n\n` +
+    `🔗 Link:\n${zoom.url}\n\n` +
+    `🆔 Meeting ID:\n${zoom.meetingId}\n\n` +
+    `🔐Passcode:\n${zoom.passcode}`;
+
+  const res = await fetch("https://api.line.me/v2/bot/message/reply", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      replyToken,
+      messages: [
+        {
+          type: "flex",
+          altText: zoom.title,
+          contents: flexMessage.contents,
+        },
+        {
+          type: "text",
+          text: fallbackText,
+        },
+      ],
+    }),
+  });
+
+  const result = await res.text();
+  console.log("LINE zoom reply:", res.status, result);
 }
