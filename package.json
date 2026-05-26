@@ -1,0 +1,13 @@
+{
+  "name": "NexyGirl",
+  "version": "1.0.0",
+  "description": "น้อง Nexy แจ้งข่าว",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}
